@@ -1,0 +1,416 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    touch-action: none;
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+}
+
+/* Canvas Styles */
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    cursor: default;
+}
+
+/* Loading Screen */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1s ease;
+}
+
+.loading-container {
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.loading-container h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    color: #7cfc00;
+    text-shadow: 0 0 10px rgba(124, 252, 0, 0.8);
+    animation: pulse 2s infinite;
+}
+
+.progress-bar {
+    height: 20px;
+    background-color: #222;
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+    border: 2px solid #444;
+}
+
+.progress {
+    height: 100%;
+    background: linear-gradient(90deg, #7cfc00, #00ff7f);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(124, 252, 0, 0.5);
+}
+
+.alien-loader {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #7cfc00;
+    margin: 30px auto;
+    position: relative;
+    animation: moveAlien 3s infinite, pulse 1s infinite alternate;
+}
+
+.alien-loader:before, .alien-loader:after {
+    content: '';
+    position: absolute;
+    background-color: #7cfc00;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    top: -5px;
+}
+
+.alien-loader:before {
+    left: 5px;
+}
+
+.alien-loader:after {
+    right: 5px;
+}
+
+.fade-out {
+    opacity: 0;
+}
+
+/* Animation Keyframes */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes moveAlien {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Visual Effect Classes */
+.shake-effect {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(calc(-1 * var(--shake-intensity, 5px))); }
+    20%, 40%, 60%, 80% { transform: translateX(var(--shake-intensity, 5px)); }
+}
+
+.pulse-effect {
+    animation: pulseEffect var(--pulse-duration, 300ms) ease-in-out;
+}
+
+@keyframes pulseEffect {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(var(--pulse-scale, 1.1)); }
+}
+
+.glow-effect {
+    animation: glowEffect var(--glow-duration, 1000ms) ease-in-out;
+}
+
+@keyframes glowEffect {
+    0%, 100% { box-shadow: none; }
+    50% { box-shadow: var(--glow-intensity, 0 0 10px) var(--glow-color, #fff); }
+}
+
+.fade-in {
+    animation: fadeIn var(--fade-duration, 500ms) ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-out {
+    animation: fadeOut var(--fade-duration, 500ms) ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Touch Controls */
+.touch-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 100;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.touch-controls:hover, .touch-controls:active {
+    opacity: 0.8;
+}
+
+.d-pad {
+    width: 150px;
+    height: 150px;
+    position: relative;
+}
+
+.d-pad-button {
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #7cfc00;
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #7cfc00;
+    font-size: 1.5rem;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.d-pad-button.up { top: 0; left: 50px; }
+.d-pad-button.right { top: 50px; left: 100px; }
+.d-pad-button.down { top: 100px; left: 50px; }
+.d-pad-button.left { top: 50px; left: 0; }
+
+.d-pad-button.active {
+    background: rgba(124, 252, 0, 0.3);
+    transform: scale(0.95);
+}
+
+.action-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #7cfc00;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #7cfc00;
+    font-size: 1rem;
+    z-index: 100;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.action-button:hover, .action-button:active {
+    opacity: 0.8;
+    background: rgba(124, 252, 0, 0.3);
+    transform: scale(0.95);
+}
+
+/* UI Elements */
+.ui-button {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #7cfc00;
+    border-radius: 5px;
+    color: #7cfc00;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ui-button:hover {
+    background: rgba(124, 252, 0, 0.2);
+}
+
+.ui-button:active {
+    transform: scale(0.95);
+}
+
+.ui-panel {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #444;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.ui-bar {
+    height: 20px;
+    background-color: #222;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #444;
+    margin: 5px 0;
+}
+
+.ui-bar-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 8px;
+}
+
+.ui-bar-health { background: linear-gradient(90deg, #ff4444, #aa0000); }
+.ui-bar-hunger { background: linear-gradient(90deg, #44ff44, #00aa00); }
+.ui-bar-oxygen { background: linear-gradient(90deg, #4444ff, #0000aa); }
+
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #666;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 14px;
+    color: #fff;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Notification */
+.notification {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #7cfc00;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: #fff;
+    font-size: 16px;
+    z-index: 100;
+    opacity: 0;
+    animation: notificationFade 3s ease-in-out;
+}
+
+@keyframes notificationFade {
+    0% { opacity: 0; transform: translate(-50%, -20px); }
+    10% { opacity: 1; transform: translate(-50%, 0); }
+    90% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* Evolution Tree */
+.evolution-tree {
+    width: 90%;
+    max-width: 800px;
+    height: 80%;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #4488aa;
+    border-radius: 10px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.evolution-branch {
+    margin-bottom: 30px;
+}
+
+.branch-name {
+    font-size: 1.2rem;
+    color: #7cfc00;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+}
+
+.evolution-path {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    padding: 20px 0;
+}
+
+.path-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #444;
+    z-index: 1;
+}
+
+.evolution-node {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #222;
+    border: 2px solid #666;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.evolution-node.current {
+    border-color: #ffff00;
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+.evolution-node.unlocked {
+    border-color: #7cfc00;
+    cursor: pointer;
+}
+
+.evolution-node.locked {
+    border-color: #666;
+    opacity: 0.7;
+}
+
+.node-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #444;
+    border-radius: 50%;
+}
+
+.node-name {
+    position: absolute;
+    width: 120px;
+    text-align: center;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+}
+
+.node-cost {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    color: #aaa;
+}

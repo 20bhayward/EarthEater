@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>EarthEater</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loading-container">
+            <h1>EARTH EATER</h1>
+            <div class="progress-bar">
+                <div class="progress" id="loading-progress"></div>
+            </div>
+            <p>Loading assets and generating world...</p>
+            <div class="alien-loader"></div>
+        </div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="touch-controls" class="touch-controls" style="display: none;">
+        <div class="d-pad">
+            <div class="d-pad-button up" id="dpad-up">↑</div>
+            <div class="d-pad-button right" id="dpad-right">→</div>
+            <div class="d-pad-button down" id="dpad-down">↓</div>
+            <div class="d-pad-button left" id="dpad-left">←</div>
+        </div>
+        <div class="action-button" id="action-button">Dig</div>
+    </div>
+    
+    <script src="scripts/main.js" type="module"></script>
+</body>
+</html>
