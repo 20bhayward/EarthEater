@@ -10,20 +10,62 @@ window.addEventListener('load', async () => {
         console.log('EarthEater game starting...');
         
         // Show loading screen (already in HTML)
-        updateLoadingProgress(10, 'Initializing game...');
+        updateLoadingProgress(5, 'Initializing game...');
+        
+        // Load web fonts if available
+        if (window.WebFont) {
+            try {
+                await new Promise((resolve) => {
+                    WebFont.load({
+                        google: {
+                            families: ['Press Start 2P', 'VT323']
+                        },
+                        active: resolve,
+                        inactive: resolve, // Continue even if fonts fail
+                        timeout: 2000 // 2 second timeout
+                    });
+                });
+                console.log('Custom fonts loaded');
+            } catch (e) {
+                console.warn('Failed to load custom fonts:', e);
+            }
+        }
+        updateLoadingProgress(15, 'Loading fonts...');
         
         // Preload external libraries
         await preloadLibraries();
         console.log('Loaded external libraries');
         updateLoadingProgress(30, 'Loading libraries...');
         
-        // Generate placeholder assets
+        // Generate placeholder assets (simulating slow load for effect)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        updateLoadingProgress(40, 'Creating tiles...');
+        
         await generatePlaceholderImages();
         console.log('Generated placeholder assets');
-        updateLoadingProgress(50, 'Creating game assets...');
+        updateLoadingProgress(55, 'Creating sprites...');
         
-        // Try to load any real assets if they exist
+        // Load external sprite assets from sprite databases
         try {
+            // Try to load better assets from online sprite repositories or our own assets
+            const externalAssetUrls = [
+                'https://api.opsive.com/assets/UltimateCharacterController/demo/sprites/sheet1.png',
+                'https://www.spriters-resource.com/resources/sheets/36/38772.png'
+            ];
+            
+            for (const url of externalAssetUrls) {
+                const img = new Image();
+                img.src = url;
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve; // Continue even if this specific asset fails
+                    
+                    // Add a timeout in case the image never loads or errors
+                    setTimeout(resolve, 3000);
+                });
+            }
+            
+            // Try to load any local assets if they exist
             await loadAssets();
             console.log('Loaded external assets');
         } catch (error) {
@@ -31,31 +73,66 @@ window.addEventListener('load', async () => {
         }
         updateLoadingProgress(70, 'Loading assets...');
         
+        // Simulate world generation (add a slight delay for UX)
+        await new Promise(resolve => setTimeout(resolve, 800));
+        updateLoadingProgress(80, 'Generating terrain...');
+        
         // Initialize sound effects
         initSoundEffects();
         console.log('Sound system initialized');
-        updateLoadingProgress(80, 'Initializing sound...');
+        updateLoadingProgress(90, 'Initializing sound...');
+        
+        // Add more loading steps for polish
+        await new Promise(resolve => setTimeout(resolve, 300));
+        updateLoadingProgress(95, 'Preparing underground...');
         
         // Create and start the game
         const game = new Game();
         window.gameInstance = game; // Store for debug access
-        updateLoadingProgress(90, 'Generating world...');
+        
+        // Final loading step
+        await new Promise(resolve => setTimeout(resolve, 200));
+        updateLoadingProgress(100, 'Ready to dig!');
         
         // Start the game after a short delay to show loading complete
         setTimeout(() => {
             hideLoadingScreen();
             game.start();
+            
+            // Add click handler to start game button
+            const canvas = document.getElementById('gameCanvas');
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                // Check if click is within the start game button area
+                const buttonX = canvas.width / 2;
+                const buttonY = (canvas.height - 400) / 2 + 210; // Matches position in renderMainMenu
+                const buttonWidth = 280;
+                const buttonHeight = 50;
+                
+                if (x >= buttonX - buttonWidth/2 && 
+                    x <= buttonX + buttonWidth/2 && 
+                    y >= buttonY - buttonHeight/2 && 
+                    y <= buttonY + buttonHeight/2 &&
+                    game.gameState === 'menu') {
+                    
+                    console.log('Start button clicked!');
+                    game.startGame();
+                }
+            });
+            
             console.log('Game started');
-        }, 1000);
+        }, 1500); // Slightly longer delay for UX
         
-        updateLoadingProgress(100, 'Ready to play!');
     } catch (error) {
         console.error('Failed to initialize game:', error);
         document.body.innerHTML = `
-            <div style="color: white; text-align: center; margin-top: 100px;">
-                <h1>Failed to start the game</h1>
-                <p>${error.message}</p>
-                <button onclick="location.reload()">Try Again</button>
+            <div style="color: white; text-align: center; margin-top: 100px; font-family: Verdana, sans-serif;">
+                <h1 style="color: #ffde7d; text-shadow: 3px 3px 0 #000;">Game Failed to Start</h1>
+                <p style="color: #dfdfdf; margin: 20px 0;">${error.message}</p>
+                <button style="background: #4d2e19; color: #ffde7d; border: 3px solid #965f2c; padding: 10px 20px; font-size: 16px; cursor: pointer;" onclick="location.reload()">Try Again</button>
             </div>
         `;
     }

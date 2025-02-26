@@ -238,6 +238,10 @@ export default class InputManager {
                (this.hasGamepad && this.gamepadAction);
     }
     
+    isSpacePressed() {
+        return this.isKeyDown('Space');
+    }
+    
     isMenuUp() {
         return this.menuKeyStates.up;
     }

@@ -93,6 +93,12 @@ export default class Player {
         
         // Handle input and movement
         this.handleInput(inputManager);
+        
+        // Check if we're mining/digging
+        if (this.isDigging && this.digCooldown <= 0) {
+            this.mine(world);
+        }
+        
         this.updatePosition(deltaTime, world);
         
         // Update vital stats
@@ -102,7 +108,7 @@ export default class Player {
         this.updateAnimation(deltaTime);
         
         // Check for collisions with environment
-        this.checkEnvironmentCollisions(world);
+        this.checkEnvironmentCollisions(world, deltaTime);
         
         // Update particles and effects
         this.particles.update(deltaTime);
@@ -116,6 +122,11 @@ export default class Player {
         // Damage flash effect
         if (this.damageFlashTime > 0) {
             this.damageFlashTime -= deltaTime;
+        }
+        
+        // Track maximum depth
+        if (this.y > (this.maxDepthReached || 0)) {
+            this.maxDepthReached = this.y;
         }
     }
     
@@ -290,7 +301,7 @@ export default class Player {
         }
     }
     
-    checkEnvironmentCollisions(world) {
+    checkEnvironmentCollisions(world, deltaTime) {
         // Check collisions with environmental hazards at the player's position
         const centerTile = world.getTileAt(this.x + this.width/2, this.y + this.height/2);
         
@@ -298,47 +309,43 @@ export default class Player {
         const { resistances, vulnerabilities } = this.evolutionManager.getCurrentCapabilities();
         
         // Handle special environments
-        switch(centerTile.type) {
-            case 'lava':
-                if (resistances.includes('lava')) {
-                    // Immune or reduced damage
-                    if (resistances.includes('lava') !== 'immune') {
-                        this.takeDamage(2 * deltaTime * (1 - this.appliedEffects.lavaDamageReduction));
-                    }
-                } else {
-                    // Full damage
-                    this.takeDamage(10 * deltaTime);
-                    this.createDamageParticles('red');
+        if (centerTile === 'lava') {
+            if (resistances.includes('lava')) {
+                // Immune or reduced damage
+                if (resistances.includes('lava') !== 'immune') {
+                    this.takeDamage(2 * deltaTime * (1 - this.appliedEffects.lavaDamageReduction));
                 }
-                break;
-                
-            case 'gas':
-                if (resistances.includes('gas')) {
-                    // Immune or reduced damage
-                    if (resistances.includes('gas') !== 'immune') {
-                        this.takeDamage(1 * deltaTime * (1 - this.appliedEffects.gasDamageReduction));
-                    }
-                } else {
-                    // Full damage 
-                    this.takeDamage(5 * deltaTime);
-                    this.createDamageParticles('green');
+            } else {
+                // Full damage
+                this.takeDamage(10 * deltaTime);
+                this.createDamageParticles('red');
+            }
+        }
+        else if (centerTile === 'gas') {
+            if (resistances.includes('gas')) {
+                // Immune or reduced damage
+                if (resistances.includes('gas') !== 'immune') {
+                    this.takeDamage(1 * deltaTime * (1 - this.appliedEffects.gasDamageReduction));
                 }
-                break;
-                
-            case 'water':
-                this.isUnderwater = true;
-                // Check if water is a vulnerability
-                if (vulnerabilities.includes('water')) {
-                    this.takeDamage(1 * deltaTime * (1 - this.appliedEffects.waterDamageReduction));
-                }
-                break;
-                
-            default:
-                this.isUnderwater = false;
+            } else {
+                // Full damage 
+                this.takeDamage(5 * deltaTime);
+                this.createDamageParticles('green');
+            }
+        }
+        else if (centerTile === 'water') {
+            this.isUnderwater = true;
+            // Check if water is a vulnerability
+            if (vulnerabilities.includes('water')) {
+                this.takeDamage(1 * deltaTime * (1 - this.appliedEffects.waterDamageReduction));
+            }
+        }
+        else {
+            this.isUnderwater = false;
         }
         
         // Check if at alien nest to restore hunger
-        if (centerTile.type === 'alienNest') {
+        if (centerTile === 'alienNest') {
             // Restore hunger more quickly when at nest
             this.hunger = Math.min(this.maxHunger, this.hunger + (10 * deltaTime));
         }

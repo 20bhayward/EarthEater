@@ -5,16 +5,31 @@
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: 'Terraria';
+    src: url('https://fonts.cdnfonts.com/css/andy-bold') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Import Press Start 2P font for Terraria-like text */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 body {
     overflow: hidden;
     background-color: #000;
+    background-image: url('https://rare-gallery.com/uploads/posts/541284-terraria-game-world.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     touch-action: none;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Press Start 2P', 'Verdana', sans-serif;
     color: #fff;
+    image-rendering: pixelated;
 }
 
 /* Canvas Styles */
@@ -33,7 +48,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #000;
+    background: url('https://rare-gallery.com/uploads/posts/541284-terraria-game-world.jpg');
+    background-size: cover;
+    background-position: center;
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -43,63 +60,82 @@ body {
 }
 
 .loading-container {
-    width: 80%;
-    max-width: 500px;
+    width: 90%;
+    max-width: 600px;
     text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border: 6px solid #7d5736;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+/* Inner border for Terraria style */
+.loading-container::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 4px solid #cc9966;
+    pointer-events: none;
 }
 
 .loading-container h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
     margin-bottom: 2rem;
-    color: #7cfc00;
-    text-shadow: 0 0 10px rgba(124, 252, 0, 0.8);
-    animation: pulse 2s infinite;
+    color: #f8d878;
+    font-family: 'Press Start 2P', 'Verdana', sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 4px 4px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    letter-spacing: 2px;
+    line-height: 1.2;
 }
 
 .progress-bar {
-    height: 20px;
-    background-color: #222;
-    border-radius: 10px;
-    margin: 20px 0;
+    height: 30px;
+    background-color: #161209;
+    margin: 30px 0;
     overflow: hidden;
-    border: 2px solid #444;
+    border: 3px solid #7d5736;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    position: relative;
 }
 
 .progress {
     height: 100%;
-    background: linear-gradient(90deg, #7cfc00, #00ff7f);
+    background: linear-gradient(to right, #8b5a2b, #cc9966);
     width: 0%;
     transition: width 0.3s ease;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(124, 252, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 222, 125, 0.5);
 }
 
-.alien-loader {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #7cfc00;
-    margin: 30px auto;
+.loading-container p {
+    color: #e6c78b;
+    font-size: 18px;
+    font-family: 'Verdana', sans-serif;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 20px;
+}
+
+/* Custom loader inspired by Terraria */
+.terraria-loader {
+    width: 80px;
+    height: 80px;
+    margin: 20px auto;
     position: relative;
-    animation: moveAlien 3s infinite, pulse 1s infinite alternate;
+    background: url('https://static.wikia.nocookie.net/terraria_gamepedia/images/e/ea/Enchanted_Nightcrawler.png/revision/latest?cb=20200516233425') no-repeat;
+    background-size: contain;
+    background-position: center;
+    filter: drop-shadow(0 0 5px rgba(255, 222, 125, 0.7));
+    animation: float 2s infinite alternate ease-in-out;
 }
 
-.alien-loader:before, .alien-loader:after {
-    content: '';
-    position: absolute;
-    background-color: #7cfc00;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    top: -5px;
-}
-
-.alien-loader:before {
-    left: 5px;
-}
-
-.alien-loader:after {
-    right: 5px;
+@keyframes float {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-15px) rotate(10deg); }
 }
 
 .fade-out {

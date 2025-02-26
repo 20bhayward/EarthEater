@@ -92,7 +92,20 @@ export default class Game {
                 break;
                 
             case GAME_STATE.MENU:
+                // Handle menu input
+                if (this.inputManager.isAction() || this.inputManager.isSpacePressed()) {
+                    console.log("Start button pressed!");
+                    this.startGame();
+                }
+                break;
+                
             case GAME_STATE.GAME_OVER:
+                // Handle game over input
+                if (this.inputManager.isAction() || this.inputManager.isSpacePressed()) {
+                    this.startGame();
+                }
+                break;
+                
             case GAME_STATE.EVOLUTION:
             case GAME_STATE.UPGRADE:
                 // Only update UI in these states
@@ -144,50 +157,296 @@ export default class Game {
     }
     
     renderMainMenu() {
-        // Main menu background
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        // Main menu background - more like Terraria
+        const bgImage = new Image();
+        bgImage.src = 'https://rare-gallery.com/uploads/posts/541284-terraria-game-world.jpg';
         
-        // Title
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.font = 'bold 48px Arial';
+        // Draw background
+        if (bgImage.complete) {
+            // Draw image with slight darkening for better contrast
+            this.ctx.drawImage(bgImage, 0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            // Fallback gradient background if image isn't loaded
+            const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+            gradient.addColorStop(0, '#004080');
+            gradient.addColorStop(0.6, '#001933');
+            gradient.addColorStop(1, '#000000');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            // Add some stars in the background
+            this.ctx.fillStyle = 'white';
+            for (let i = 0; i < 100; i++) {
+                const size = Math.random() * 2 + 1;
+                this.ctx.fillRect(
+                    Math.random() * this.canvas.width,
+                    Math.random() * this.canvas.height * 0.8,
+                    size, 
+                    size
+                );
+            }
+        }
+        
+        // Menu panel
+        const panelWidth = 500;
+        const panelHeight = 400;
+        const panelX = (this.canvas.width - panelWidth) / 2;
+        const panelY = (this.canvas.height - panelHeight) / 2;
+        
+        // Draw wooden panel background with pixel-art style (Terraria-like)
+        this.drawTerrariaPanelBackground(panelX, panelY, panelWidth, panelHeight);
+        
+        // Title with Terraria-like style
+        this.ctx.fillStyle = '#f8d878';
+        this.ctx.font = 'bold 48px "Press Start 2P", Verdana';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('EarthEater', this.canvas.width / 2, this.canvas.height / 3);
+        this.ctx.textBaseline = 'middle';
+        
+        // Text shadow for Terraria-like effect
+        this.ctx.shadowColor = '#000';
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 4;
+        this.ctx.shadowOffsetY = 4;
+        this.ctx.fillText('EARTH EATER', this.canvas.width / 2, panelY + 80);
         
         // Subtitle
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText('Consume. Evolve. Conquer.', this.canvas.width / 2, this.canvas.height / 3 + 40);
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.font = 'bold 18px "Press Start 2P", Verdana';
+        this.ctx.fillText('Consume. Evolve. Conquer.', this.canvas.width / 2, panelY + 140);
         
-        // Start prompt
-        this.ctx.font = '24px Arial';
-        this.ctx.fillText('Press Space to Start', this.canvas.width / 2, this.canvas.height * 2 / 3);
+        // Menu options with selected indicator
+        this.drawTerrariaMenuButton('Start Game', this.canvas.width / 2, panelY + 210, true);
+        this.drawTerrariaMenuButton('Options', this.canvas.width / 2, panelY + 270, false);
+        this.drawTerrariaMenuButton('Exit', this.canvas.width / 2, panelY + 330, false);
+        
+        // Reset shadow
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        this.ctx.shadowBlur = 0;
         
         // Controls hint
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('Use Arrow Keys or WASD to move, Space to dig', this.canvas.width / 2, this.canvas.height * 2 / 3 + 40);
+        this.ctx.fillStyle = '#dfdfdf';
+        this.ctx.font = '16px Verdana';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Use Arrow Keys or WASD to move, Space to select', this.canvas.width / 2, panelY + panelHeight + 30);
+        
+        // Version number
+        this.ctx.fillStyle = '#999';
+        this.ctx.font = '12px Verdana';
+        this.ctx.fillText('v1.0.0', this.canvas.width - 50, this.canvas.height - 20);
+    }
+    
+    // Terraria-style wooden panel background
+    drawTerrariaPanelBackground(x, y, width, height) {
+        // Panel background - dark with wood texture
+        this.ctx.fillStyle = '#3e2718';
+        this.ctx.fillRect(x, y, width, height);
+        
+        // Draw the wood texture pattern
+        this.ctx.fillStyle = '#59381f';
+        
+        // Draw wood grain lines
+        for (let i = 0; i < height; i += 8) {
+            this.ctx.fillRect(x, y + i, width, 3);
+        }
+        
+        // Thick border for Terraria-like panels
+        this.ctx.lineWidth = 6;
+        this.ctx.strokeStyle = '#7d5736';
+        this.ctx.strokeRect(x, y, width, height);
+        
+        // Inner border
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = '#cc9966';
+        this.ctx.strokeRect(x + 8, y + 8, width - 16, height - 16);
+        
+        // Inner glow effect
+        const gradient = this.ctx.createLinearGradient(x, y, x, y + height);
+        gradient.addColorStop(0, 'rgba(255, 230, 150, 0.05)');
+        gradient.addColorStop(0.5, 'rgba(255, 230, 150, 0.02)');
+        gradient.addColorStop(1, 'rgba(255, 230, 150, 0)');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(x + 10, y + 10, width - 20, height - 20);
+    }
+    
+    // Terraria-style menu button
+    drawTerrariaMenuButton(text, x, y, isSelected) {
+        const buttonWidth = 280;
+        const buttonHeight = 50;
+        const buttonX = x - buttonWidth / 2;
+        const buttonY = y - buttonHeight / 2;
+        
+        // Button background
+        this.ctx.fillStyle = isSelected ? '#8b5a2b' : '#59381f';
+        this.ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Button border
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = isSelected ? '#e6c78b' : '#8b5a2b';
+        this.ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Button inner border
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = isSelected ? '#ffffff' : '#cc9966';
+        this.ctx.strokeRect(buttonX + 3, buttonY + 3, buttonWidth - 6, buttonHeight - 6);
+        
+        // Selected indicator (arrow icon)
+        if (isSelected) {
+            this.ctx.fillStyle = '#f8d878';
+            this.ctx.font = '24px Verdana';
+            this.ctx.fillText('>', buttonX + 15, y);
+        }
+        
+        // Button text
+        this.ctx.fillStyle = isSelected ? '#f8d878' : '#e6c78b';
+        this.ctx.font = isSelected ? 'bold 20px "Press Start 2P", Verdana' : '20px "Press Start 2P", Verdana';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.shadowColor = '#000';
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.fillText(text, x, y);
+    }
+    
+    // Keeping the old method for backwards compatibility but it won't be used
+    drawMenuButton(text, x, y) {
+        this.drawTerrariaMenuButton(text, x, y, false);
     }
     
     renderGameOver() {
-        // Game over background
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        // Game over background - Terraria style
+        const bgImage = new Image();
+        bgImage.src = 'https://rare-gallery.com/uploads/posts/541284-terraria-game-world.jpg';
+        
+        if (bgImage.complete) {
+            // Draw image with dark overlay
+            this.ctx.drawImage(bgImage, 0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            // Fallback dark red gradient
+            const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+            gradient.addColorStop(0, '#330000');
+            gradient.addColorStop(1, '#000000');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        
+        // Game over panel
+        const panelWidth = 500;
+        const panelHeight = 450;
+        const panelX = (this.canvas.width - panelWidth) / 2;
+        const panelY = (this.canvas.height - panelHeight) / 2;
+        
+        // Draw Terraria-style panel background with darker colors for game over
+        this.ctx.fillStyle = '#2e0c08';
+        this.ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Draw the wood texture pattern in dark red
+        this.ctx.fillStyle = '#491209';
+        for (let i = 0; i < panelHeight; i += 8) {
+            this.ctx.fillRect(panelX, panelY + i, panelWidth, 3);
+        }
+        
+        // Thick border for Terraria-like panels
+        this.ctx.lineWidth = 6;
+        this.ctx.strokeStyle = '#6d1717';
+        this.ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
+        
+        // Inner border
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = '#bc3636';
+        this.ctx.strokeRect(panelX + 8, panelY + 8, panelWidth - 16, panelHeight - 16);
         
         // Game over text
-        this.ctx.fillStyle = '#ff0000';
-        this.ctx.font = 'bold 48px Arial';
+        this.ctx.fillStyle = '#ff4444';
+        this.ctx.font = 'bold 48px "Press Start 2P", Verdana';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('GAME OVER', this.canvas.width / 2, this.canvas.height / 3);
+        this.ctx.textBaseline = 'middle';
         
-        // Stats
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText(`Maximum Depth: ${Math.floor(this.player.maxDepthReached / 32)}m`, this.canvas.width / 2, this.canvas.height / 3 + 60);
-        this.ctx.fillText(`Resources Collected: $${this.player.money}`, this.canvas.width / 2, this.canvas.height / 3 + 100);
-        this.ctx.fillText(`Evolution Reached: ${this.capitalizeFirstLetter(this.player.evolutionManager.currentEvolution.type)}`, this.canvas.width / 2, this.canvas.height / 3 + 140);
+        // Text shadow for Terraria-like effect
+        this.ctx.shadowColor = '#000';
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 4;
+        this.ctx.shadowOffsetY = 4;
+        this.ctx.fillText('GAME OVER', this.canvas.width / 2, panelY + 70);
         
-        // Restart prompt
-        this.ctx.font = '24px Arial';
-        this.ctx.fillText('Press Space to Restart', this.canvas.width / 2, this.canvas.height * 2 / 3);
+        // Reset shadow for stats
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        
+        // Stats panel
+        const statsPanelY = panelY + 130;
+        this.ctx.fillStyle = 'rgba(20, 0, 0, 0.5)';
+        this.ctx.fillRect(panelX + 50, statsPanelY, panelWidth - 100, 180);
+        this.ctx.strokeStyle = '#8b0000';
+        this.ctx.strokeRect(panelX + 50, statsPanelY, panelWidth - 100, 180);
+        
+        // Stats header
+        this.ctx.fillStyle = '#ffde7d';
+        this.ctx.font = 'bold 24px "Press Start 2P", Verdana';
+        this.ctx.fillText('STATS', this.canvas.width / 2, statsPanelY + 30);
+        
+        // Stats content
+        this.ctx.fillStyle = '#dfdfdf';
+        this.ctx.font = '16px Verdana';
+        this.ctx.textAlign = 'left';
+        
+        const statsX = panelX + 70;
+        const maxDepth = this.player.maxDepthReached ? Math.floor(this.player.maxDepthReached / 32) : Math.floor(this.player.y / 32);
+        this.ctx.fillText(`Maximum Depth: ${maxDepth}m`, statsX, statsPanelY + 70);
+        this.ctx.fillText(`Resources Collected: $${this.player.money}`, statsX, statsPanelY + 110);
+        this.ctx.fillText(`Evolution Stage: ${this.capitalizeFirstLetter(this.player.evolutionManager.currentEvolution.type)}`, statsX, statsPanelY + 150);
+        
+        // Reset text alignment
+        this.ctx.textAlign = 'center';
+        
+        // Restart button - Terraria style
+        const buttonY = panelY + 340;
+        this.drawTerrariaButton('Try Again', this.canvas.width / 2, buttonY, true);
+        
+        // Controls hint
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        this.ctx.fillStyle = '#dfdfdf';
+        this.ctx.font = '16px Verdana';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Press SPACE to restart', this.canvas.width / 2, panelY + panelHeight - 30);
+    }
+    
+    // Terraria-style button specially for game over screen
+    drawTerrariaButton(text, x, y, isSelected) {
+        const buttonWidth = 240;
+        const buttonHeight = 60;
+        const buttonX = x - buttonWidth / 2;
+        const buttonY = y - buttonHeight / 2;
+        
+        // Button background - red for game over
+        this.ctx.fillStyle = isSelected ? '#8b0000' : '#660000';
+        this.ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Button border
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeStyle = '#bc3636';
+        this.ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        
+        // Button inner border
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = '#ff4444';
+        this.ctx.strokeRect(buttonX + 3, buttonY + 3, buttonWidth - 6, buttonHeight - 6);
+        
+        // Button text
+        this.ctx.fillStyle = '#ffde7d';
+        this.ctx.font = 'bold 24px "Press Start 2P", Verdana';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.shadowColor = '#000';
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.fillText(text, x, y);
     }
     
     renderDebugInfo() {
@@ -213,6 +472,8 @@ export default class Game {
     }
     
     startGame() {
+        console.log('Starting new game...');
+        
         // Reset game components for a new game
         this.world = new World();
         this.player = new Player(GAME_WIDTH / 2, 100);
@@ -224,6 +485,8 @@ export default class Game {
         // Change game state to playing
         this.gameState = GAME_STATE.PLAYING;
         this.isPaused = false;
+        
+        console.log('Game state changed to PLAYING');
     }
     
     gameOver() {

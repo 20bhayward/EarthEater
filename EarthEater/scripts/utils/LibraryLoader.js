@@ -15,6 +15,18 @@ const EXTERNAL_LIBRARIES = [
         url: 'https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@20.0.0/dist/tween.umd.js',
         global: 'TWEEN',
         optional: true // Game can work without this
+    },
+    {
+        name: 'PixiJS',
+        url: 'https://cdn.jsdelivr.net/npm/pixi.js@7.3.2/dist/pixi.min.js',
+        global: 'PIXI',
+        optional: true // For improved graphics
+    },
+    {
+        name: 'FontLoader',
+        url: 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js',
+        global: 'WebFont',
+        optional: true // For custom font loading
     }
 ];
 
